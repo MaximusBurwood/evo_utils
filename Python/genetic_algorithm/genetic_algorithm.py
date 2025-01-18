@@ -1,48 +1,47 @@
-import random
+import numpy as np
 
 CHROMOSOME_LENGTH = 16  # Length of binary representation of individuals
 POPULATION_SIZE = 128   # Number of individuals in the population
 MUTATION_RATE = 0.05    # Probability of mutation for each bit
 CROSSOVER_RATE = 0.8    # Probability of crossover
-GENERATIONS = 100      # Number of generations to evolve
+GENERATIONS = 100       # Number of generations to evolve
 
 file_path = "Python/genetic_algorithm/genetic_algorithm_data.csv"  # File to save data for graphing
 
 def fitness_function(chromosome):
-    """Calculate the fitness of a chromosome (maximize x^2)."""
+    # Calculate the fitness of a chromosome (maximise x^2)
     x = int(''.join(map(str, chromosome)), 2)  # Convert binary to decimal
     return x ** 2
 
 def create_individual():
-    """Generate a random individual (binary chromosome)."""
-    return [random.randint(0, 1) for _ in range(CHROMOSOME_LENGTH)]
+    # Generate a random individual (binary chromosome)
+    return np.random.randint(2, size=CHROMOSOME_LENGTH).tolist()
 
 def create_population():
-    """Create an initial population of random individuals."""
+    # Create an initial population of random individuals
     return [create_individual() for _ in range(POPULATION_SIZE)]
 
 def select_parent(population, fitness_scores):
-    """Select a parent using roulette wheel selection."""
+    # Select a parent using roulette wheel selection
     total_fitness = sum(fitness_scores)
     selection_probabilities = [score / total_fitness for score in fitness_scores]
-    return population[random.choices(range(len(population)), weights=selection_probabilities, k=1)[0]]
+    return population[np.random.choice(range(len(population)), p=selection_probabilities)]
 
 def crossover(parent1, parent2):
-    """Perform single-point crossover between two parents."""
-    if random.random() < CROSSOVER_RATE:
-        point = random.randint(1, CHROMOSOME_LENGTH - 1)
+    # Perform single-point crossover between two parents.
+    if np.random.rand() < CROSSOVER_RATE:
+        point = np.random.randint(1, CHROMOSOME_LENGTH)
         child1 = parent1[:point] + parent2[point:]
         child2 = parent2[:point] + parent1[point:]
         return child1, child2
     return parent1, parent2
 
 def mutate(chromosome):
-    """Mutate a chromosome with a given mutation rate."""
-    return [bit ^ 1 if random.random() < MUTATION_RATE else bit for bit in chromosome]
+    # Mutate a chromosome with a given mutation rate
+    return [bit ^ 1 if np.random.rand() < MUTATION_RATE else bit for bit in chromosome]
 
 def genetic_algorithm():
-    """Run the Genetic Algorithm."""
-    # Initialize population
+    # Initialise population
     population = create_population()
 
     # Prepare the output file
@@ -89,5 +88,6 @@ def genetic_algorithm():
     return max(population, key=fitness_function)
 
 if __name__ == "__main__":
+    np.random.seed(42)
     best_solution = genetic_algorithm()
     print(f"Best solution: {''.join(map(str, best_solution))}, Fitness = {fitness_function(best_solution)}")

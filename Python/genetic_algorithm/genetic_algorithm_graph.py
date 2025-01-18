@@ -1,6 +1,5 @@
 import pandas as pd
 import plotly.graph_objects as go
-import numpy as np
 
 # File location
 file_path = "Python/genetic_algorithm/genetic_algorithm_data.csv"
@@ -36,7 +35,7 @@ fig.add_trace(go.Scatter(
     line=dict(color='red', width=2)
 ))
 
-# Customize the layout
+# Customise the layout
 fig.update_layout(
     title="Genetic Algorithm Fitness Over Generations",
     xaxis_title="Generation",
