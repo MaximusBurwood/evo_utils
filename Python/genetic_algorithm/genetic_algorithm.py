@@ -1,12 +1,14 @@
 import numpy as np
+import os
 
-CHROMOSOME_LENGTH = 16  # Length of binary representation of individuals
-POPULATION_SIZE = 128   # Number of individuals in the population
-MUTATION_RATE = 0.05    # Probability of mutation for each bit
-CROSSOVER_RATE = 0.8    # Probability of crossover
-GENERATIONS = 100       # Number of generations to evolve
+# Constants/Parameters
+CHROMOSOME_LENGTH = 16    # Length of binary representation of individuals
+POPULATION_SIZE = 128     # Number of individuals in the population 
+MUTATION_RATE = 0.05     # Probability of mutation for each bit
+CROSSOVER_RATE = 0.8     # Probability of crossover
+GENERATIONS = 100        # Number of generations to evolve
 
-file_path = "Python/genetic_algorithm/genetic_algorithm_data.csv"  # File to save data for graphing
+file_path = "Python/genetic_algorithm/genetic_algorithm_data.csv"  # File to save data
 
 def fitness_function(chromosome):
     # Calculate the fitness of a chromosome (maximise x^2)
@@ -28,7 +30,7 @@ def select_parent(population, fitness_scores):
     return population[np.random.choice(range(len(population)), p=selection_probabilities)]
 
 def crossover(parent1, parent2):
-    # Perform single-point crossover between two parents.
+    # Perform single-point crossover between two parents
     if np.random.rand() < CROSSOVER_RATE:
         point = np.random.randint(1, CHROMOSOME_LENGTH)
         child1 = parent1[:point] + parent2[point:]
@@ -40,39 +42,33 @@ def mutate(chromosome):
     # Mutate a chromosome with a given mutation rate
     return [bit ^ 1 if np.random.rand() < MUTATION_RATE else bit for bit in chromosome]
 
-def genetic_algorithm():
-    # Initialise population
+def generate_genetic_algorithm_data(file_path):
+    # Initialize population
     population = create_population()
-
+    
     # Prepare the output file
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
     with open(file_path, "w") as file:
         file.write("Generation,Best_Fitness,Median_Fitness,Worst_Fitness\n")
 
     for generation in range(GENERATIONS):
         # Evaluate fitness
         fitness_scores = [fitness_function(individual) for individual in population]
-
+        
         # Sort individuals by fitness
         sorted_population = sorted(zip(population, fitness_scores), key=lambda x: x[1])
         population, fitness_scores = zip(*sorted_population)
-
-        # Track the best, median, and worst individuals
-        best_individual = population[-1]
+        
+        # Track statistics
         best_fitness = fitness_scores[-1]
-        median_individual = population[len(population) // 2]
         median_fitness = fitness_scores[len(population) // 2]
-        worst_individual = population[0]
         worst_fitness = fitness_scores[0]
-
-        print(f"Generation {generation + 1}: Best fitness = {best_fitness}, Best individual = {''.join(map(str, best_individual))}")
-        print(f"                   Median fitness = {median_fitness}, Median individual = {''.join(map(str, median_individual))}")
-        print(f"                   Worst fitness = {worst_fitness}, Worst individual = {''.join(map(str, worst_individual))}")
-
-        # Save the data to the file
+        
+        # Save the data
         with open(file_path, "a") as file:
             file.write(f"{generation + 1},{best_fitness},{median_fitness},{worst_fitness}\n")
-
-        # Create a new population through selection, crossover, and mutation
+        
+        # Create new population
         new_population = []
         while len(new_population) < POPULATION_SIZE:
             parent1 = select_parent(population, fitness_scores)
@@ -81,13 +77,11 @@ def genetic_algorithm():
             new_population.append(mutate(child1))
             if len(new_population) < POPULATION_SIZE:
                 new_population.append(mutate(child2))
-
+                
         population = new_population
-
-    # Return the best solution found
-    return max(population, key=fitness_function)
+    
+    print(f"Data saved to {file_path}")
 
 if __name__ == "__main__":
     np.random.seed(42)
-    best_solution = genetic_algorithm()
-    print(f"Best solution: {''.join(map(str, best_solution))}, Fitness = {fitness_function(best_solution)}")
+    generate_genetic_algorithm_data(file_path)
