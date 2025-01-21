@@ -1,6 +1,9 @@
 # Prerequisites
 *.d
 
+#devcontainer
+*.devcontainer
+
 # Compiled Object files
 *.slo
 *.lo
