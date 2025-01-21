@@ -1,0 +1,74 @@
+# Start with Ubuntu-based R environment
+FROM rocker/r-ubuntu:latest
+
+# Set maintainer label
+LABEL maintainer="Your Name <your.email@example.com>"
+
+# Update system and install essential tools
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    libxml2-dev \
+    libz-dev \
+    libbz2-dev \
+    liblzma-dev \
+    python3 \
+    python3-pip \
+    git \
+    wget \
+    curl \
+    samtools \
+    bedtools \
+    hmmer \
+    ncbi-blast+ \
+    fastqc \
+    bowtie2 \
+    star \
+    rsem \
+    htseq \
+    tabix \
+    vim \
+    less \
+    htop
+
+# Install essential R packages from CRAN
+RUN install2.r --error --skipinstalled \
+    devtools \
+    tidyverse \
+    data.table \
+    RColorBrewer \
+    pheatmap \
+    ggpubr \
+    BiocManager
+
+# Install Bioconductor packages
+RUN R -e "BiocManager::install(c( \
+    'DESeq2', \
+    'edgeR', \
+    'limma', \
+    'Biostrings', \
+    'GenomicRanges', \
+    'GenomicAlignments', \
+    'GEOquery', \
+    'ComplexHeatmap', \
+    'AnnotationDbi', \
+    'clusterProfiler' \
+    ), update = FALSE, ask = FALSE)"
+
+# Install Python packages for bioinformatics
+RUN pip3 install --no-cache-dir \
+    numpy \
+    pandas \
+    scipy \
+    matplotlib \
+    seaborn \
+    biopython \
+    pysam \
+    cutadapt \
+    multiqc
+
+# Install Seurat for single-cell analysis
+RUN R -e "install.packages('Seurat')" && \
+    R -e "remotes::install_github('satijalab/seurat-data')"
