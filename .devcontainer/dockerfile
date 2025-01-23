@@ -2,12 +2,13 @@
 FROM rocker/r-ubuntu:latest
 
 # Set maintainer label
-LABEL maintainer="Your Name <your.email@example.com>"
+LABEL maintainer="Maximus Burwood <maximus.burwood@gmail.com>"
 
-# Update system and install essential tools
+# Update system and install essential tools, including C++ and Julia
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
     build-essential \
+    julia \
     libcurl4-openssl-dev \
     libssl-dev \
     libxml2-dev \
@@ -33,7 +34,7 @@ RUN apt-get update && apt-get upgrade -y && \
     less \
     htop
 
-# Install essential R packages from CRAN
+# Install essential R packages
 RUN install2.r --error --skipinstalled \
     devtools \
     tidyverse \
@@ -57,7 +58,7 @@ RUN R -e "BiocManager::install(c( \
     'clusterProfiler' \
     ), update = FALSE, ask = FALSE)"
 
-# Install Python packages for bioinformatics
+# Install Python packages
 RUN pip3 install --no-cache-dir \
     numpy \
     pandas \
@@ -69,6 +70,6 @@ RUN pip3 install --no-cache-dir \
     cutadapt \
     multiqc
 
-# Install Seurat for single-cell analysis
+# Install Seurat and SeuratData
 RUN R -e "install.packages('Seurat')" && \
     R -e "remotes::install_github('satijalab/seurat-data')"
